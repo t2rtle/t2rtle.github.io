@@ -179,8 +179,7 @@
         const dados = {};
         for (let i = 0; i < localStorage.length; i++) {
             const chave = localStorage.key(i);
-            if (!chave) continue;
-            if (chave.startsWith("bc_config_") || chave.startsWith(BACKUP_PREFIX) || chave === CONFIG.ultimoBackup) continue;
+            if (!chave || !CHAVES_PROTEGIDAS.has(chave)) continue;
             dados[chave] = localStorage.getItem(chave);
         }
         return dados;
@@ -246,7 +245,7 @@
         "xp", "nivel", "xpProximoNivel", "cliquesTotais", "tempoJogado", "rebirths",
         "prestigeTokens", "prestigeTokensEarned", "prestigeUpgrades", "requisitoRebirth",
         "conquistas", "ultimoSave", "petColecao", "petAtivoId", "petNomes", "petNiveis",
-        "bc_expansion_state_v1", "bc_statistics_v2"
+        "bc_expansion_state_v1", "bc_statistics_v2", "burgerClickerLanguage"
     ]);
 
     function validarPacoteBackup(pacote) {
@@ -255,14 +254,15 @@
             return false;
         }
 
+        // Backups antigos podem conter chaves auxiliares de outras versões.
+        // Elas serão ignoradas durante a restauração; nunca serão gravadas no storage.
         const entradas = Object.entries(pacote.dados);
-        if (entradas.length > CHAVES_PROTEGIDAS.size) return false;
+        if (entradas.length > 500) return false;
 
-        return entradas.every(([chave, valor]) =>
-            CHAVES_PROTEGIDAS.has(chave) &&
+        return entradas.every(([, valor]) =>
             (typeof valor === "string" || typeof valor === "number" || typeof valor === "boolean") &&
             String(valor).length <= 200000
-        );
+        ) && entradas.some(([chave]) => CHAVES_PROTEGIDAS.has(chave));
     }
 
     function restaurarPacote(pacote) {
@@ -285,7 +285,10 @@
             localStorage.clear();
             Object.entries(configuracoes).forEach(([chave, valor]) => localStorage.setItem(chave, valor));
             Object.entries(pacote.dados).forEach(([chave, valor]) => {
-                localStorage.setItem(chave, String(valor));
+                // Importação segura: só restaura chaves reconhecidas pelo jogo.
+                if (CHAVES_PROTEGIDAS.has(chave)) {
+                    localStorage.setItem(chave, String(valor));
+                }
             });
         } catch (erro) {
             // Tenta devolver o armazenamento ao estado anterior se a restauração falhar.
