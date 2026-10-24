@@ -1,0 +1,42 @@
+/* Companheiro emoji que passeia pela janela sem bloquear cliques. */
+.pet-passeante {
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    width: max-content;
+    min-width: 48px;
+    min-height: 48px;
+    display: grid;
+    place-items: center;
+    font-size: clamp(2.5rem, 5vw, 3.8rem);
+    line-height: 1.15;
+    pointer-events: none;
+    user-select: none;
+    will-change: transform;
+    filter: drop-shadow(0 3px 3px rgb(0 0 0 / 16%));
+    contain: layout style;
+}
+.pet-passeante[hidden] {
+    display: none !important;
+}
+.pet-passeante-idle {
+    animation: petPasseanteIdle 1.8s ease-in-out infinite;
+}
+.pet-passeante-walk {
+    animation: petPasseanteWalk .32s ease-in-out infinite alternate;
+}
+@keyframes petPasseanteIdle {
+    0%, 100% { margin-top: 0; }
+    50% { margin-top: -5px; }
+}
+@keyframes petPasseanteWalk {
+    from { margin-top: 0; }
+    to { margin-top: -7px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .pet-passeante-idle,
+    .pet-passeante-walk {
+        animation: none !important;
+    }
+}
