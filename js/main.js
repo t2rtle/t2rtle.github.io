@@ -267,9 +267,9 @@ setInterval(() => {
 setInterval(() => { tempoJogado++; }, 1000);
 
 function salvarJogo() {
-    // O reset limpa o armazenamento e recarrega a página. Não grave o estado
-    // antigo durante o evento beforeunload, ou o progresso reaparece.
-    if (window.__burgerClickerResetEmAndamento) return;
+    // O reset e a restauração limpam/substituem o armazenamento e recarregam a página.
+    // Não grave o estado antigo durante o evento beforeunload, ou o progresso reaparece.
+    if (window.__burgerClickerResetEmAndamento || window.__burgerClickerRestoreEmAndamento) return;
 
     // Os saldos e estatísticas de hambúrgueres são sempre inteiros.
     hamburgueres = Math.max(0, Math.round(hamburgueres));
