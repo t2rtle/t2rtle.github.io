@@ -301,8 +301,8 @@
             throw new Error("A restauração falhou e o jogo tentou preservar o progresso anterior. Verifique o armazenamento disponível.");
         }
 
-        // O backup anterior já foi preservado pelo fluxo de restauração.
-        // Não o sobrescreva aqui com uma cópia do estado recém-restaurado.
+        // Impede que os listeners de saída salvem o estado antigo em cima do backup importado.
+        window.__burgerClickerRestoreEmAndamento = true;
         location.reload();
     }
 
@@ -361,11 +361,10 @@
 
     function iniciarBackupAutomatico() {
         const backupSeguro = () => {
-            if (window.__burgerClickerResetEmAndamento) return;
+            if (window.__burgerClickerResetEmAndamento || window.__burgerClickerRestoreEmAndamento) return;
             try {
                 salvarBackupAutomatico();
             } catch (erro) {
-                // Armazenamento cheio ou bloqueado não deve gerar exceções sem tratamento.
                 console.warn("[Burger Clicker] Backup automático indisponível:", erro);
                 if (elementos.statusBackup) {
                     elementos.statusBackup.textContent = "⚠️ Não foi possível salvar o backup automático. Baixe um backup manual.";
@@ -375,8 +374,8 @@
         setTimeout(backupSeguro, 5000);
         setInterval(backupSeguro, BACKUP_INTERVALO);
         window.addEventListener("beforeunload", () => {
-            // Um reset não deve criar um backup vazio depois de preservar o último backup útil.
-            if (window.__burgerClickerResetEmAndamento) return;
+            // Um reset ou restauração não deve criar um backup por cima do estado que acabou de ser preservado/importado.
+            if (window.__burgerClickerResetEmAndamento || window.__burgerClickerRestoreEmAndamento) return;
             try { salvarBackupAutomatico(); } catch (erro) {
                 console.warn("[Burger Clicker] Não foi possível criar o backup ao sair:", erro);
             }
