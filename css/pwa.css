@@ -112,19 +112,29 @@ html.tema-escuro .bc-pwa-update-popup__actions [data-pwa-update-apply] {
     .bc-pwa-update-popup__card { animation: none; }
 }
 
-/* Player identity: force the nickname/title block to the viewport center. */
+/* Player identity: responsive centering without viewport-relative offsets.
+   Avoid left:50%/translateX because mobile browser and PWA viewports can differ. */
 .bc-player-identity {
-    position: relative !important;
-    left: 50% !important;
-    width: min(520px, calc(100vw - 24px)) !important;
+    position: static !important;
+    left: auto !important;
+    transform: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
     max-width: 520px !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    transform: translateX(-50%) !important;
+    min-width: 0 !important;
+    margin: 10px auto 28px !important;
+    padding-inline: 12px !important;
     text-align: center !important;
 }
 .bc-player-identity .bc-player-name,
 .bc-player-identity .bc-player-title {
-    width: 100% !important;
+    display: block !important;
+    box-sizing: border-box !important;
+    max-width: 100% !important;
+    overflow-wrap: anywhere !important;
     text-align: center !important;
 }
