@@ -65,10 +65,27 @@
         nav.className = "bc-areas-nav";
         nav.setAttribute("aria-label", "Áreas do Burger Clicker");
 
-        const titulo = document.createElement("p");
-        titulo.className = "bc-areas-titulo";
-        titulo.textContent = "📂 Menus do jogo";
-        nav.appendChild(titulo);
+        const toggleMenus = document.createElement("button");
+        toggleMenus.type = "button";
+        toggleMenus.className = "bc-areas-titulo";
+        toggleMenus.id = "bc-menus-toggle";
+        toggleMenus.setAttribute("aria-expanded", "false");
+        toggleMenus.setAttribute("aria-controls", "bc-menus-lista");
+        toggleMenus.innerHTML = '<span class="bc-menus-titulo-texto">📂 Menus do jogo</span><span class="bc-menus-seta" aria-hidden="true">⌄</span>';
+        nav.appendChild(toggleMenus);
+
+        const listaMenus = document.createElement("div");
+        listaMenus.className = "bc-menus-lista";
+        listaMenus.id = "bc-menus-lista";
+        listaMenus.hidden = true;
+        nav.appendChild(listaMenus);
+
+        toggleMenus.addEventListener("click", () => {
+            const aberta = toggleMenus.getAttribute("aria-expanded") !== "true";
+            toggleMenus.setAttribute("aria-expanded", aberta ? "true" : "false");
+            listaMenus.hidden = !aberta;
+            toggleMenus.classList.toggle("aberto", aberta);
+        });
 
         const secoes = [];
         const abrirArea = (indice, foco = true) => {
@@ -97,7 +114,7 @@
             botao.setAttribute("aria-controls", elemento.id);
             botao.setAttribute("aria-expanded", "false");
             botao.addEventListener("click", () => abrirArea(indice));
-            nav.appendChild(botao);
+            listaMenus.appendChild(botao);
             secoes.push({ botao, elemento });
         });
 
