@@ -37,7 +37,6 @@ html.tema-escuro #pwaAplicarAtualizacaoBtn {
     .bc-pwa-update * { scroll-behavior: auto; }
 }
 
-
 /* In-app update prompt: shown only while the installed PWA is running. */
 .bc-pwa-update-popup[hidden] {
     display: none !important;
@@ -111,4 +110,21 @@ html.tema-escuro .bc-pwa-update-popup__actions [data-pwa-update-apply] {
 }
 @media (prefers-reduced-motion: reduce) {
     .bc-pwa-update-popup__card { animation: none; }
+}
+
+/* Player identity: force the nickname/title block to the viewport center. */
+.bc-player-identity {
+    position: relative !important;
+    left: 50% !important;
+    width: min(520px, calc(100vw - 24px)) !important;
+    max-width: 520px !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    transform: translateX(-50%) !important;
+    text-align: center !important;
+}
+.bc-player-identity .bc-player-name,
+.bc-player-identity .bc-player-title {
+    width: 100% !important;
+    text-align: center !important;
 }
