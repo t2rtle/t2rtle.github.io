@@ -1,12 +1,12 @@
 /* Burger Clicker PWA Service Worker — update-aware cache */
 const CACHE_PREFIX = "burger-clicker-";
-const CACHE_NAME = "burger-clicker-v63";
+const CACHE_NAME = "burger-clicker-v64";
 const APP_SHELL = [
     "/", "/index.html", "/manifest.json", "/style.css",
     "/css/pets.css", "/css/tooltips.css", "/css/settings.css", "/css/navigation.css", "/css/welcome.css", "/css/glass-ui.css", "/css/info-pages.css", "/css/animations.css", "/css/pwa.css",
     "/js/info-language.js", "/js/game-i18n.js", "/js/core.js", "/js/systems.js", "/js/main.js", "/js/audio.js", "/js/audio-diagnostics.js", "/js/welcome.js", "/js/tooltips.js", "/js/settings.js", "/js/settings-compat.js",
     "/js/expansion-bridge.js", "/js/expansion.js", "/js/expansion-ui.js", "/js/statistics.js", "/js/statistics-accuracy.js",
-    "/js/pwa.js", "/js/pwa-diagnostics.js", "/js/reset.js", "/js/navigation.js", "/js/animations.js",
+    "/js/pwa.js", "/js/pwa-diagnostics.js", "/js/reset.js", "/js/navigation.js", "/js/content-expansion.js", "/js/animations.js",
     "/about.html", "/privacy.html", "/contact.html", "/media/background.jpg", "/media/art_1.png", "/media/art_2.png", "/media/pwa-icon.svg"
 ];
 
@@ -21,8 +21,6 @@ self.addEventListener("install", event => {
                 console.warn("[Burger Clicker PWA] Recurso não pré-cacheado:", path, error);
             }
         }));
-        // Activate the new worker immediately so fixes to audio/network handling are not
-        // held behind an older worker. Game progress is stored separately from this cache.
         await self.skipWaiting();
     })());
 });
@@ -38,9 +36,7 @@ self.addEventListener("activate", event => {
 });
 
 self.addEventListener("message", event => {
-    if (event.data?.type === "SKIP_WAITING") {
-        event.waitUntil(self.skipWaiting());
-    }
+    if (event.data?.type === "SKIP_WAITING") event.waitUntil(self.skipWaiting());
     if (event.data?.type === "CLEAR_APP_CACHE") {
         event.waitUntil(caches.keys().then(names => Promise.all(
             names.filter(name => name.startsWith(CACHE_PREFIX)).map(name => caches.delete(name))
@@ -65,21 +61,13 @@ self.addEventListener("fetch", event => {
                 return response;
             } catch {
                 const cache = await caches.open(CACHE_NAME);
-                return await caches.match(request, { ignoreSearch: true }) ||
-                    await cache.match("/index.html") ||
-                    await cache.match("/") ||
-                    new Response("Sem conexão. Conecte-se à internet e tente novamente.", {
-                        status: 503, headers: { "Content-Type": "text/plain; charset=utf-8" }
-                    });
+                return await caches.match(request, { ignoreSearch: true }) || await cache.match("/index.html") || await cache.match("/") || new Response("Sem conexão. Conecte-se à internet e tente novamente.", { status: 503, headers: { "Content-Type": "text/plain; charset=utf-8" } });
             }
         })());
         return;
     }
 
     const path = url.pathname.toLowerCase();
-
-    // Áudio: nunca pré-armazenar permanentemente no Cache Storage da PWA.
-    // Sempre buscar a versão publicada; o preload="none" evita baixar antes de precisar.
     if (path === "/media/music.mp3" || path === "/media/click.mp3") {
         event.respondWith(fetch(request, { cache: "no-store" }));
         return;
@@ -95,8 +83,7 @@ self.addEventListener("fetch", event => {
                 }
                 return response;
             } catch {
-                return await caches.match(request) ||
-                    new Response("", { status: 504, statusText: "Offline" });
+                return await caches.match(request) || new Response("", { status: 504, statusText: "Offline" });
             }
         })());
         return;
