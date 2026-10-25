@@ -88,17 +88,45 @@
         });
 
         const secoes = [];
+        const desativarMenusExpandidos = () => {
+            document.querySelectorAll(".bc-menus-lista [data-exp-open]").forEach(botao => {
+                botao.classList.remove("ativo");
+                botao.setAttribute("aria-expanded", "false");
+            });
+        };
+
         const abrirArea = (indice, foco = true) => {
+            const secaoAlvo = secoes[indice];
+            const abrir = Boolean(secaoAlvo && secaoAlvo.elemento.hidden);
             secoes.forEach((secao, i) => {
-                const aberta = i === indice && secao.elemento.hidden;
+                const aberta = i === indice && abrir;
                 secao.elemento.hidden = !aberta;
                 secao.botao.setAttribute("aria-expanded", aberta ? "true" : "false");
                 secao.botao.classList.toggle("ativo", aberta);
             });
-            if (foco && secoes[indice]?.elemento && !secoes[indice].elemento.hidden) {
-                requestAnimationFrame(() => secoes[indice].elemento.scrollIntoView({ behavior: "smooth", block: "start" }));
+            const painelExtra = document.querySelector(".bc-exp-panel");
+            if (painelExtra) painelExtra.hidden = true;
+            desativarMenusExpandidos();
+            if (foco && abrir && secaoAlvo?.elemento) {
+                requestAnimationFrame(() => secaoAlvo.elemento.scrollIntoView({ behavior: "smooth", block: "start" }));
             }
         };
+
+        document.addEventListener("bc:open-menu", evento => {
+            secoes.forEach(secao => {
+                secao.elemento.hidden = true;
+                secao.botao.setAttribute("aria-expanded", "false");
+                secao.botao.classList.remove("ativo");
+            });
+            const painelExtra = document.querySelector(".bc-exp-panel");
+            if (painelExtra) painelExtra.hidden = true;
+            desativarMenusExpandidos();
+            const botaoAlvo = document.querySelector(`.bc-menus-lista [data-exp-open="${evento.detail?.id}"]`);
+            if (botaoAlvo) {
+                botaoAlvo.classList.add("ativo");
+                botaoAlvo.setAttribute("aria-expanded", "true");
+            }
+        });
 
         AREAS.forEach(([id, rotulo, seletor], indice) => {
             const elemento = document.querySelector(seletor);
@@ -119,11 +147,6 @@
         });
 
         painel.insertAdjacentElement("afterend", nav);
-        if (secoes.length) {
-            secoes[0].elemento.hidden = false;
-            secoes[0].botao.setAttribute("aria-expanded", "true");
-            secoes[0].botao.classList.add("ativo");
-        }
         carregarExpansaoConteudo();
     }
 
