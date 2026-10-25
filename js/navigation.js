@@ -29,20 +29,31 @@
         }
     }
 
+    function carregarExpansaoConteudo() {
+        if (document.querySelector('script[data-burger-content-expansion="true"]')) return;
+        const script = document.createElement("script");
+        script.src = "/js/content-expansion.js";
+        script.defer = true;
+        script.dataset.burgerContentExpansion = "true";
+        document.body.appendChild(script);
+    }
+
     function iniciarNavegacao() {
         carregarEstilos();
 
         const painel = document.querySelector(".painel");
         const configBtn = document.getElementById("configBtn");
         const languageArea = document.querySelector(".info-language");
-        if (!painel || !configBtn || document.querySelector(".bc-areas-nav")) return;
+        if (!painel || !configBtn || document.querySelector(".bc-areas-nav")) {
+            carregarExpansaoConteudo();
+            return;
+        }
 
         document.querySelectorAll('body > img[src*="art_1"]').forEach(imagem => {
             imagem.hidden = true;
             imagem.setAttribute("aria-hidden", "true");
         });
 
-        // Configurações fica junto do seletor de idioma, fora da lista de áreas.
         if (languageArea) {
             configBtn.classList.add("bc-settings-top-btn");
             configBtn.style.margin = "0";
@@ -96,6 +107,7 @@
             secoes[0].botao.setAttribute("aria-expanded", "true");
             secoes[0].botao.classList.add("ativo");
         }
+        carregarExpansaoConteudo();
     }
 
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", iniciarNavegacao, { once: true });
