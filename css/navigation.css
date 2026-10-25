@@ -241,3 +241,27 @@ html.tema-escuro .bc-areas-titulo {
 @media (prefers-reduced-motion: reduce) {
   .bc-menus-seta, .bc-areas-titulo { transition: none; }
 }
+
+
+/* Menu do jogo neutro: sem destaque laranja e com todos os atalhos agrupados. */
+.bc-areas-titulo {
+  background: rgba(255,255,255,.92);
+  color: #432b20;
+  border: 1px solid rgba(60,35,20,.12);
+  box-shadow: 0 3px 10px rgba(60,35,20,.08), inset 0 1px 0 rgba(255,255,255,.7);
+}
+.bc-areas-titulo:hover { filter: none; background: rgba(245,245,245,.98); }
+html.tema-escuro .bc-areas-titulo {
+  background: #292b31;
+  color: #f4eee7;
+  border-color: rgba(255,255,255,.09);
+}
+html.tema-escuro .bc-areas-titulo:hover { background: #34363d; }
+.bc-menus-lista .bc-area-btn {
+  background: rgba(255,255,255,.92);
+  color: #432b20;
+}
+html.tema-escuro .bc-menus-lista .bc-area-btn {
+  background: #292b31;
+  color: #f4eee7;
+}
